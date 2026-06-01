@@ -1,3 +1,4 @@
+// Configuration: Ensure this URL is your latest Web App deployment
 const API_URL = "https://script.google.com/macros/s/AKfycbx-ObyarvSubZFTZmXIhf2sUPKJxqZHB0tDeahoRQ1tTVNY4Pskybu3I3zT4NKYmsN4/exec";
 
 // Initialize Scanner
@@ -41,7 +42,8 @@ async function verifyParticipant(id, name, email, phone) {
     showResult("Verifying...", "blue");
 
     try {
-        const response = await fetch(API_URL, {
+        // Send POST request to mark attendance
+        await fetch(API_URL, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ participantId: id })
@@ -49,7 +51,9 @@ async function verifyParticipant(id, name, email, phone) {
         
         // Success UI
         showResult(`✅ ${name} Checked In!`, "green");
-        updateStats(); // Refresh stats after successful check-in
+        
+        // Refresh stats after successful check-in
+        setTimeout(updateStats, 1000); 
     } catch (error) {
         showResult("❌ Server Error", "red");
     }
@@ -60,17 +64,22 @@ function showResult(message, color) {
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `<p class="font-bold text-${color}-600">${message}</p>`;
     resultDiv.classList.remove("hidden");
+    
+    // Hide result after 4 seconds
+    setTimeout(() => resultDiv.classList.add("hidden"), 4000);
 }
 
 // Update Stats Dashboard
 async function updateStats() {
     try {
-        const response = await fetch(API_URL); // Assumes GET returns your stats
+        // Fetch stats via GET request
+        const response = await fetch(API_URL); 
         const data = await response.json();
+        
         document.getElementById('total-count').innerText = data.total;
         document.getElementById('attend-count').innerText = data.attending;
     } catch (err) {
-        console.log("Stats fetch skipped (ensure doGet is set in Apps Script)");
+        console.log("Stats fetch skipped: Ensure doGet() is correctly deployed in Apps Script.");
     }
 }
 
