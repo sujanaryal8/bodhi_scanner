@@ -1,89 +1,56 @@
-// Configuration: Ensure this URL is your latest Web App deployment
-const API_URL = "https://script.google.com/macros/s/AKfycbxJOVEJ1NNGu7KUjRJn8Pqmb32Qg_cmp2p68RPi6zhE5rAKdSMAwKxjQg6FSI0WC6Sr/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxJOVEJ1NNGu7KUjRJn8Pqmb32Qg_cmp2p68RPi6zhE5rAKdSMAwKxjQg6FSI0WC6Sr/exec"; 
 
-// Initialize Scanner
 const html5QrCode = new Html5Qrcode("reader");
 
-// Start Rear Camera Automatically
-function startScanner() {
-    html5QrCode.start(
-        { facingMode: "environment" }, 
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
-            onScanSuccess(decodedText);
+async function startScanner() {
+    try {
+        // Wait for cameras to be listed to ensure hardware is ready
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras && cameras.length > 0) {
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    onScanSuccess(decodedText);
+                }
+            );
+        } else {
+            document.getElementById("reader").innerHTML = "<p class='p-4 text-red-500'>No cameras found.</p>";
         }
-    ).catch(err => {
-        console.error("Camera access failed", err);
-        document.getElementById("reader").innerHTML = 
-            "<p class='p-4 text-red-500'>Camera access denied. Please allow permissions in settings.</p>";
-    });
+    } catch (err) {
+        document.getElementById("reader").innerHTML = "<p class='p-4 text-red-500'>Permission denied.</p>";
+    }
 }
 
-// Handle Successful Scan
-let lastScan = "";
 function onScanSuccess(decodedText) {
-    if (decodedText === lastScan) return;
-    lastScan = decodedText;
-
-    // Parse Data: ID|Name|Email|Phone
     const parts = decodedText.split('|');
     if (parts.length === 4) {
         verifyParticipant(parts[0], parts[1], parts[2], parts[3]);
-    } else {
-        showResult("❌ Invalid QR Code format", "red");
     }
-    
-    // Reset scan after 3 seconds
-    setTimeout(() => { lastScan = ""; }, 3000);
 }
 
-// Verify Participant against Sheet
 async function verifyParticipant(id, name, email, phone) {
-    showResult("Verifying...", "blue");
-
     try {
-        // Send POST request to mark attendance
         await fetch(API_URL, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ participantId: id })
         });
-        
-        // Success UI
-        showResult(`✅ ${name} Checked In!`, "green");
-        
-        // Refresh stats after successful check-in
-        setTimeout(updateStats, 1000); 
-    } catch (error) {
-        showResult("❌ Server Error", "red");
-    }
+        document.getElementById("result").innerHTML = `<p class='font-bold text-green-600'>✅ ${name} Checked In!</p>`;
+        document.getElementById("result").classList.remove("hidden");
+        updateStats();
+    } catch (e) { alert("Error connecting to server"); }
 }
 
-// Helper: Show Result
-function showResult(message, color) {
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = `<p class="font-bold text-${color}-600">${message}</p>`;
-    resultDiv.classList.remove("hidden");
-    
-    // Hide result after 4 seconds
-    setTimeout(() => resultDiv.classList.add("hidden"), 4000);
-}
-
-// Update Stats Dashboard
 async function updateStats() {
     try {
-        // Fetch stats via GET request
-        const response = await fetch(API_URL); 
-        const data = await response.json();
-        
+        const res = await fetch(API_URL);
+        const data = await res.json();
         document.getElementById('total-count').innerText = data.total;
         document.getElementById('attend-count').innerText = data.attending;
-    } catch (err) {
-        console.log("Stats fetch skipped: Ensure doGet() is correctly deployed in Apps Script.");
-    }
+    } catch (e) {}
 }
 
-// Initialize on Load
 window.addEventListener('load', () => {
     startScanner();
     updateStats();
