@@ -2,20 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bodhi Sambad Scanner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        /* Event Brand Colors */
+        :root { --brand-color: #70231a; }
+        .bg-brand { background-color: var(--brand-color); }
+        .text-brand { color: var(--brand-color); }
+    </style>
 </head>
 <body class="bg-gray-50 flex flex-col items-center p-4">
+    <div class="w-full max-w-sm mb-6 text-center">
+        <img src="YOUR_LOGO_URL.png" class="mx-auto h-16 mb-2">
+        <h1 class="text-2xl font-bold text-brand">BODHI SAMBAD 2026</h1>
+    </div>
 
-    <h1 class="text-2xl font-bold text-slate-800 mb-6">Bodhi Sambad Check-In</h1>
-
-    <div id="reader" class="w-full max-w-sm rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-white"></div>
-
-    <div id="result" class="mt-6 w-full max-w-sm hidden">
+    <div class="grid grid-cols-2 gap-4 w-full max-w-sm mb-6">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-center">
+            <p class="text-xs text-gray-500 uppercase">Total</p>
+            <p id="total-count" class="text-xl font-bold">--</p>
         </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-center">
+            <p class="text-xs text-brand uppercase">Attending</p>
+            <p id="attend-count" class="text-xl font-bold text-brand">--</p>
+        </div>
+    </div>
 
-    <script src="app.js"></script>
+    <div id="reader" class="w-full max-w-sm rounded-xl overflow-hidden shadow-lg border border-gray-200"></div>
+    <div id="result" class="mt-6 w-full max-w-sm p-6 bg-white rounded-2xl shadow-sm text-center hidden"></div>
 </body>
 </html>
