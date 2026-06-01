@@ -1,0 +1,45 @@
+/* Basic reset and font */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8fafc;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    color: #0f172a;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+/* Scanner Container */
+#reader {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Result Card Styling */
+#result {
+    margin-top: 24px;
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    background: white;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
+}
+
+/* Helper class for hiding */
+.hidden {
+    display: none;
+}
