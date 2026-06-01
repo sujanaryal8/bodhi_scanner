@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxJOVEJ1NNGu7KUjRJn8Pqmb32Qg_cmp2p68RPi6zhE5rAKdSMAwKxjQg6FSI0WC6Sr/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbz2whhW64YA38EzqdePpJHbGf8DnbaJJi1zsASkLcLn8wj09IFpLAnSbSxNYgrHeoBl/exec"; 
 
 const html5QrCode = new Html5Qrcode("reader");
 
