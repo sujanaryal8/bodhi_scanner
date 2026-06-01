@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const API_URL = "https://script.google.com/macros/s/AKfycby-Y9u0J6SWsUgWNtSn4GBFhuPg2aXNXteqVjgyJOIjyDzuez5H2jTTWkEapUqanQ5g/exec"; // PASTE YOUR NEW DEPLOYMENT URL HERE
+const API_URL = "https://script.google.com/macros/s/AKfycbynECsROpmvWpNJ95QIVTpO2bOV57xKDMmN9M3jwsZh7lo130OmRk8EpydPFmmvkQvb/exec"; // PASTE YOUR NEW DEPLOYMENT URL HERE
 
 // Initialize the QR Scanner
 const html5QrCode = new Html5Qrcode("reader");
