@@ -1,4 +1,4 @@
-const API_URL = "PASTE_YOUR_NEW_URL_HERE"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbzY6UdkDj23yau0lXVt7POPHyoTtb6tfBiLTy8tEJ6w8WrQaOYtkvmgPBlrKzWwHhVz/exec"; 
 const html5QrCode = new Html5Qrcode("reader");
 
 function startScanner() {
