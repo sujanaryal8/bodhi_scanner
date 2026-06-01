@@ -1,57 +1,53 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbz2whhW64YA38EzqdePpJHbGf8DnbaJJi1zsASkLcLn8wj09IFpLAnSbSxNYgrHeoBl/exec"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbwXZDG1jIo63D7ZFPlH03eDZ4C2SHANMlGL0Mq8Ty7v6dtRyineclVsPIj1AbcIlpvm/exec";
 
 const html5QrCode = new Html5Qrcode("reader");
 
-async function startScanner() {
-    try {
-        // Wait for cameras to be listed to ensure hardware is ready
-        const cameras = await Html5Qrcode.getCameras();
-        if (cameras && cameras.length > 0) {
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: 250 },
-                (decodedText) => {
-                    onScanSuccess(decodedText);
-                }
-            );
-        } else {
-            document.getElementById("reader").innerHTML = "<p class='p-4 text-red-500'>No cameras found.</p>";
-        }
-    } catch (err) {
-        document.getElementById("reader").innerHTML = "<p class='p-4 text-red-500'>Permission denied.</p>";
-    }
+function startScanner() {
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+        onScanSuccess(decodedText);
+    });
 }
 
-function onScanSuccess(decodedText) {
+async function onScanSuccess(decodedText) {
     const parts = decodedText.split('|');
     if (parts.length === 4) {
-        verifyParticipant(parts[0], parts[1], parts[2], parts[3]);
+        // Stop scanning temporarily while verifying
+        html5QrCode.pause();
+        
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({ participantId: parts[0] })
+            });
+            const data = await response.json();
+            
+            if (data.status === "success") {
+                showResult(`
+                    <div class="text-green-600 font-bold">✅ Checked In Successfully</div>
+                    <div class="text-sm mt-2 text-left">
+                        <p><b>Name:</b> ${data.name}</p>
+                        <p><b>Email:</b> ${data.email}</p>
+                        <p><b>Phone:</b> ${data.phone}</p>
+                    </div>
+                `, "green");
+            } else if (data.status === "already_checked") {
+                showResult(`<p class="text-amber-600 font-bold">⚠️ Already Checked In</p><p>${data.name} has already entered.</p>`, "amber");
+            } else {
+                showResult("❌ Participant not found", "red");
+            }
+        } catch (e) {
+            showResult("❌ Server connection error", "red");
+        }
+        
+        // Resume scanning after 3 seconds
+        setTimeout(() => { html5QrCode.resume(); }, 3000);
     }
 }
 
-async function verifyParticipant(id, name, email, phone) {
-    try {
-        await fetch(API_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: JSON.stringify({ participantId: id })
-        });
-        document.getElementById("result").innerHTML = `<p class='font-bold text-green-600'>✅ ${name} Checked In!</p>`;
-        document.getElementById("result").classList.remove("hidden");
-        updateStats();
-    } catch (e) { alert("Error connecting to server"); }
+function showResult(message, color) {
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = message;
+    resultDiv.classList.remove("hidden");
 }
 
-async function updateStats() {
-    try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        document.getElementById('total-count').innerText = data.total;
-        document.getElementById('attend-count').innerText = data.attending;
-    } catch (e) {}
-}
-
-window.addEventListener('load', () => {
-    startScanner();
-    updateStats();
-});
+window.addEventListener('load', startScanner);
